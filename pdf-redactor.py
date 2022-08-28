@@ -37,13 +37,14 @@ class Redactor:
                 areas = page.search_for(data)
                  
                 # drawing outline over sensitive datas
-                [page.add_redact_annot(area, fill = (0, 0, 0)) for area in areas]
-                 
+                # [page.add_redact_annot(area, fill = (0, 0, 0)) for area in areas]
+                [page.add_redact_annot(area, text='REDACTED_DATA') for area in areas]
+                
             # applying the redaction
             page.apply_redactions()
              
         # saving it to a new pdf
-        doc.save('redacted.pdf')
+        doc.save('replaced1.pdf')
         print("Successfully redacted")
 
 if __name__ == "__main__":
