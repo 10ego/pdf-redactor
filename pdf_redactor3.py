@@ -231,8 +231,6 @@ class Redactor:
                     area_B4 = fitz.Rect(XL0, B4_Y0, XL1, B4_Y1)
                     area_B5 = fitz.Rect(XR0, B5_Y0, XR1, B5_Y1)
                     areas_page1 = [area_A2, area_B4, area_B5]
-                    for area in areas_page1:
-                        print(area)
                     text_A2 = self.get_pmaptext(area_A2, page)
                     text_B4 = self.get_pmaptext(area_B4, page)
                     text_B5 = self.get_pmaptext(area_B5, page)
