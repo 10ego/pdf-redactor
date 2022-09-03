@@ -24,6 +24,7 @@ class Redactor:
         self.path = subdir + '/' + self.filename
         self.lang = ''
         self.errorfactor = 0
+        self.REBUILD_PDF = False
         self.page1Chk = False
         self.page2Chk = False
         self.labeldict = {
@@ -108,7 +109,8 @@ class Redactor:
             question_no = ''
         else:
             question_no = key
-        p = self.page.get_textpage_ocr(dpi=300, full=True)
+#        p = self.page.get_textpage_ocr(dpi=300, full=True)
+        p = self.page
         joiners = [". ", ".", ", ", ","]
         A = None
         if not A:
@@ -127,14 +129,15 @@ class Redactor:
         else:
             return None
 
-    def get_pmaptext(self, area):
-        pmap = self.page.get_pixmap(dpi=300, clip = area)
+    def get_pmaptext(self, area, page):
+        pmap = page.get_pixmap(dpi=300, clip = area)
         tmppdf = pmap.pdfocr_tobytes()
         tmpdoc = fitz.open("pdf", tmppdf)
         return tmpdoc[0].get_text()
 
     def redaction(self):
         doc = fitz.open(self.path)
+
         pages_to_delete = []
         bounding = doc[0].bound()
         breaker = False
@@ -143,23 +146,38 @@ class Redactor:
             page_ocr = page.get_textpage_ocr(dpi=300, full=True)
             if page_ocr.search("A. "+self.labeldict["A"]["en"]):
                 self.lang = 'en'
+                if page_ocr.search("A. "+self.labeldict["A"]["en"])[0][0][0] > page_ocr.search("A. "+self.labeldict["A"]["en"])[0][0][1]:
+                    self.REBUILD_PDF = True
                 break
             elif page_ocr.search("A. "+self.labeldict["A"]["fr"]):
                 self.lang = 'fr'
+                if page_ocr.search("A. "+self.labeldict["A"]["fr"])[0][0][0] > page_ocr.search("A. "+self.labeldict["A"]["fr"])[0][0][1]:
+                    self.REBUILD_PDF = True
                 break
         if not self.lang:
             raise "NoLanguageFoundError"
+        if self.REBUILD_PDF:
+            # Recreate the pdf to rerender cus some of them just suck too much (looking at you "000931038 MDPR_2019-7141-QA-ST_687927_F.pdf")
+            print("rebuilding the pdf")
+            newdoc = fitz.Document()
+            for page in doc:
+                bpdf = page.get_pixmap(dpi=300).pdfocr_tobytes()
+                bdoc = fitz.open('pdf', bpdf)
+                newdoc.insert_pdf(bdoc)
+            doc = newdoc
 #        print("Language:", self.lang)
         for page in doc:
             if breaker:
                 pages_to_delete.append(page.number)
                 continue
-            self.page = page
             currentpage = 0
             breaker = False
             XL1 = page.bound()[2]/2 - 5
             XR0 = page.bound()[2]/2 + 5
             
+           
+        
+            self.page = page.get_textpage_ocr(dpi=300, full=True)
             # Find reference points
             # page 1
             FOOTER = self.get_area('footer', True)
@@ -213,9 +231,11 @@ class Redactor:
                     area_B4 = fitz.Rect(XL0, B4_Y0, XL1, B4_Y1)
                     area_B5 = fitz.Rect(XR0, B5_Y0, XR1, B5_Y1)
                     areas_page1 = [area_A2, area_B4, area_B5]
-                    text_A2 = self.get_pmaptext(area_A2)
-                    text_B4 = self.get_pmaptext(area_B4)
-                    text_B5 = self.get_pmaptext(area_B5)
+                    for area in areas_page1:
+                        print(area)
+                    text_A2 = self.get_pmaptext(area_A2, page)
+                    text_B4 = self.get_pmaptext(area_B4, page)
+                    text_B5 = self.get_pmaptext(area_B5, page)
                     text_page1 = [text_A2, text_B4, text_B5]
                     hash_page1 = [hashlib.md5(x.encode()).hexdigest() for x in text_page1]
                     assert len(areas_page1) == len(text_page1)
@@ -271,13 +291,13 @@ class Redactor:
                     area_E2 = fitz.Rect(XR0, E2_Y0, XR1, E2_Y1)
                     area_E3 = fitz.Rect(XR0, E3_Y0, XR1, E3_Y1)
                     areas_page2 = [area_D2, area_D3, area_D4, area_D5, area_E1, area_E2, area_E3]
-                    text_D2 = self.get_pmaptext(area_D2)
-                    text_D3 = self.get_pmaptext(area_D3)
-                    text_D4 = self.get_pmaptext(area_D4)
-                    text_D5 = self.get_pmaptext(area_D5)
-                    text_E1 = self.get_pmaptext(area_E1)
-                    text_E2 = self.get_pmaptext(area_E2)
-                    text_E3 = self.get_pmaptext(area_E3)
+                    text_D2 = self.get_pmaptext(area_D2, page)
+                    text_D3 = self.get_pmaptext(area_D3, page)
+                    text_D4 = self.get_pmaptext(area_D4, page)
+                    text_D5 = self.get_pmaptext(area_D5, page)
+                    text_E1 = self.get_pmaptext(area_E1, page)
+                    text_E2 = self.get_pmaptext(area_E2, page)
+                    text_E3 = self.get_pmaptext(area_E3, page)
                     text_page2 = [text_D2, text_D3, text_D4, text_D5, text_E1, text_E2, text_E3]
                     hash_page2 = [hashlib.md5(x.encode()).hexdigest() for x in text_page2]
                     assert len(areas_page2) == len(text_page2)
@@ -313,6 +333,8 @@ class Redactor:
 if __name__ == "__main__":
     path = 'testing-fr.pdf'
     subdir = '.'
-    subpath = 'other'
-    redactor = Redactor(path, subdir, savesubdir)
+    savepath = 'other'
+    path = '000931038 MDPR_2019-7141-QA-ST_687927_F.pdf'
+    subdir = 'pdfs'
+    redactor = Redactor(path, subdir, savepath)
     redactor.redaction()

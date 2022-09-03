@@ -8,7 +8,9 @@ with open('other_pdf.txt') as f:
 		pdfs.append(line.rstrip())
 with open('worked.log') as f:
 	worked = [x[21:].strip() for x in f.readlines()]
-
+with open('error.log') as f:
+	errl = [x[21:].strip().split(',')[0] for x in f.readlines()]
+worked = worked + errl
 count=0
 for pdf in pdfs:
 	count+=1
