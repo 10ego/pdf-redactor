@@ -40,6 +40,10 @@ class Redactor:
                     'en':'reporter contact info',
                     'fr':'coordonnées du déclar'
                 },
+                'A5':{
+                    'en':'type of report',
+                    'fr':'type de rapport'
+                },
                 'A6':{
                     'en':'date submit',
                     'fr':'date de '
@@ -137,23 +141,24 @@ class Redactor:
 
     def redaction(self):
         doc = fitz.open(self.path)
-
         pages_to_delete = []
         bounding = doc[0].bound()
         breaker = False
         for page in doc:
             # Quickly check if the page is ready to scan or requires OCR handling
             page_ocr = page.get_textpage_ocr(dpi=300, full=True)
-            if page_ocr.search("A. "+self.labeldict["A"]["en"]):
-                self.lang = 'en'
-                if page_ocr.search("A. "+self.labeldict["A"]["en"])[0][0][0] > page_ocr.search("A. "+self.labeldict["A"]["en"])[0][0][1]:
-                    self.REBUILD_PDF = True
-                break
-            elif page_ocr.search("A. "+self.labeldict["A"]["fr"]):
-                self.lang = 'fr'
-                if page_ocr.search("A. "+self.labeldict["A"]["fr"])[0][0][0] > page_ocr.search("A. "+self.labeldict["A"]["fr"])[0][0][1]:
-                    self.REBUILD_PDF = True
-                break
+            for lang in ["en", "fr"]:
+                if page_ocr.search("A. "+self.labeldict["A"][lang]):
+                    self.lang = lang
+                    X_search = page_ocr.search("A. " + self.labeldict["A"][lang])[0][0][0]
+                    Y_search = page_ocr.search("A. " + self.labeldict["A"][lang])[0][0][1]
+                    if X_search > Y_search:
+                        self.REBUILD_PDF = True
+                    elif X_search > page.bound()[0] or X_search > page.bound()[3]: 
+                        self.REBUILD_PDF = True
+                    elif Y_search > page.bound()[1] or Y_search > page.bound()[3]:
+                        self.REBUILD_PDF = True
+                    break
         if not self.lang:
             raise "NoLanguageFoundError"
         if self.REBUILD_PDF:
@@ -187,16 +192,17 @@ class Redactor:
             E = self.get_area('E', True)
             if FOOTER:
                 FOOTERY = FOOTER[1]
-            if A:
+            if A and not D:
                 currentpage = 1
-            elif D:
+            elif D and not A:
                 currentpage = 2
-#            print("Page:", currentpage)
+            print("Page:", currentpage)
             if currentpage == 1:
                 YFactor = A[3][1] - A[1][1]
                 YFactor_small = YFactor / bounding[3] * 200
 #                print(YFactor, YFactor_small)
                 A2 = self.get_area('A2')
+                A5 = self.get_area('A5')
                 A6 = self.get_area('A6')
                 A7 = self.get_area('A7')
                 B4 = self.get_area('B4')
@@ -210,6 +216,8 @@ class Redactor:
                     if A2:
                         A2_Y0 = A2[3][1] + YFactor_small
                     else: print("A2 not found")
+                    if A5:
+                        XR0 = A5[0][0]
                     if A7:
                         A2_Y1 = A7[1][1] - YFactor * 2.5
                     else:
@@ -226,7 +234,6 @@ class Redactor:
                     else:
                         B5_Y0 = B[3][1] + YFactor * 2.5
                     B5_Y1 = B4_Y1
-                    
                     area_A2 = fitz.Rect(XL0, A2_Y0, XL1, A2_Y1)
                     area_B4 = fitz.Rect(XL0, B4_Y0, XL1, B4_Y1)
                     area_B5 = fitz.Rect(XR0, B5_Y0, XR1, B5_Y1)
@@ -332,7 +339,8 @@ if __name__ == "__main__":
     path = 'testing-fr.pdf'
     subdir = '.'
     savepath = 'other'
-    path = '000931038 MDPR_2019-7141-QA-ST_687927_F.pdf'
+    #path = '000931038 MDPR_2019-7141-QA-ST_687927_F.pdf'
+    path = '000970646(P30).pdf'
     subdir = 'pdfs'
     redactor = Redactor(path, subdir, savepath)
     redactor.redaction()

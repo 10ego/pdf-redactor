@@ -14,8 +14,8 @@ worked = worked + errl
 count=0
 for pdf in pdfs:
 	count+=1
-	print(f'{count}/10488:', pdf)
 	if not pdf in worked:
+		print(f'{count}/10488:', pdf)
 		try:
 			Redactor = pdf_redactor.Redactor(pdf, 'pdfs', 'other')
 			Redactor.redaction()
@@ -26,4 +26,5 @@ for pdf in pdfs:
 				f.write(f'[{datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S")}]{pdf}, {e.args}\n')
 				
 	else:
-		print(f'\t{pdf} already worked on')
+		pass
+#		print(f'\t{pdf} already worked on')
