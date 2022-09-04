@@ -196,7 +196,7 @@ class Redactor:
                 currentpage = 1
             elif D and not A:
                 currentpage = 2
-            print("Page:", currentpage)
+#            print("Page:", currentpage)
             if currentpage == 1:
                 YFactor = A[3][1] - A[1][1]
                 YFactor_small = YFactor / bounding[3] * 200
@@ -217,7 +217,9 @@ class Redactor:
                         A2_Y0 = A2[3][1] + YFactor_small
                     else: print("A2 not found")
                     if A5:
-                        XR0 = A5[0][0]
+                        A_X1 = A5[0][0] - YFactor_small
+                    else:
+                        A_X1 = XL1
                     if A7:
                         A2_Y1 = A7[1][1] - YFactor * 2.5
                     else:
@@ -234,7 +236,7 @@ class Redactor:
                     else:
                         B5_Y0 = B[3][1] + YFactor * 2.5
                     B5_Y1 = B4_Y1
-                    area_A2 = fitz.Rect(XL0, A2_Y0, XL1, A2_Y1)
+                    area_A2 = fitz.Rect(XL0, A2_Y0, A_X1, A2_Y1)
                     area_B4 = fitz.Rect(XL0, B4_Y0, XL1, B4_Y1)
                     area_B5 = fitz.Rect(XR0, B5_Y0, XR1, B5_Y1)
                     areas_page1 = [area_A2, area_B4, area_B5]

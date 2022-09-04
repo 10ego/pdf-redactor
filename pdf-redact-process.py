@@ -22,6 +22,7 @@ for pdf in pdfs:
 			with open('worked.log', 'a+') as f:
 				f.write(f'[{datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S")}]{pdf}\n')
 		except Exception as e:
+			print("Error. Skipping.")
 			with open('error.log', 'a+') as f:
 				f.write(f'[{datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S")}]{pdf}, {e.args}\n')
 				
