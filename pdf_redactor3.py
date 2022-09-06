@@ -360,17 +360,17 @@ class Redactor:
             json.dump(data, f)
         doc.delete_pages(pages_to_delete)
         doc.scrub()
-        doc.save(f'redacted/{quality_dir}/{self.filename[:-4]}_REDACTED.pdf')
+        doc.save(f'redacted/{quality_dir}/{self.filename[:-4]}_REDACTED.pdf', deflate_images=True, deflate_fonts=True)
         print("Successfully redacted")
         doc.close()
 
 if __name__ == "__main__":
-    path = 'testing-fr.pdf'
+    path = 'testing.pdf'
     subdir = '.'
-    savepath = 'other'
+    savepath = '.'
     #path = '000931038 MDPR_2019-7141-QA-ST_687927_F.pdf'
     #path = 'AER 000956061 .pdf' # A2 right edge and E2 detection improved with this file
-    path = 'AER 000971433 .pdf'
-    subdir = 'pdfs'
+#    path = 'AER 000971433 .pdf'
+#    subdir = 'pdfs'
     redactor = Redactor(path, subdir, savepath)
     redactor.redaction()
