@@ -1,0 +1,38 @@
+import pdf_redactor3 as pdf_redactor
+import os
+from datetime import datetime
+
+pdfs = []
+with open('other_pdf.txt') as f:
+	for line in f:
+		pdfs.append(line.rstrip())
+with open('worked.log') as f:
+	worked = [x[21:].strip() for x in f.readlines()]
+with open('worked_2.log') as f:
+	worked2 = [x[21:].strip() for x in f.readlines()]
+with open('error.log') as f:
+	errl = [x[21:].strip().split(',')[0] for x in f.readlines()]
+with open('error_2.log') as f:
+	errl2 = [x[21:].strip().split(',')[0] for x in f.readlines()]
+worked = worked + worked2 + errl2
+#worked = worked + errl
+count=0
+total = len(errl)
+for pdf in errl:
+	count+=1
+	if not pdf in worked:
+		print(f'{count}/{total}:', pdf)
+		try:
+			Redactor = pdf_redactor.Redactor(pdf, 'pdfs', 'other_pdfs-errors1')
+			Redactor.redaction()
+			with open('worked_2.log', 'a+') as f:
+				f.write(f'[{datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S")}]{pdf}\n')
+		except Exception as e:
+			print("Error. Skipping.")
+			with open('error_2.log', 'a+') as f:
+				f.write(f'[{datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S")}]{pdf}, {e}, {Redactor.errorlog}\n')
+
+				
+	else:
+		pass
+#		print(f'\t{pdf} already worked on')
