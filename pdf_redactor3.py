@@ -224,7 +224,7 @@ class Redactor:
                         A2_Y0 = A2[3][1] + YFactor_small
                     else: print("A2 not found")
                     if A5:
-                        A_X1 = A5[0][0] - YFactor_small
+                        A_X1 = A5[0][0] - YFactor * 2
                     else:
                         A_X1 = XL1
                     if A7:
