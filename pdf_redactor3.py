@@ -200,7 +200,7 @@ class Redactor:
             E = self.get_area('E', True)
             if FOOTER:
                 FOOTERY = FOOTER[1][1]
-                print("Footer_Y:",FOOTERY)
+#                print("Footer_Y:",FOOTERY)
             if A and not D:
                 currentpage = 1
             elif D and not A:
