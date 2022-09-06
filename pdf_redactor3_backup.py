@@ -97,8 +97,8 @@ class Redactor:
                     'fr':"mesures d"
                 },
                 'E2_pre':{
-                    'en':'this section only applies',
-                    'fr':'cette section doit être remplie'
+                    'en':'this section only applies for preliminary',
+                    'fr':'cette section doit être remplie uniquement'
                 },
                 'E2':{
                     'en':'root cause of problem',
@@ -110,18 +110,17 @@ class Redactor:
                 }
             }
 
-    def get_area(self, key, only_alphabet=False, footer=False):
-        
-        if footer:
-            question_no = ''
-        elif not only_alphabet:
+    def get_area(self, key, only_alphabet=False, no_label=None):
+        p = self.page
+        joiners = [". ", ".", ", ", ","]
+        A = None
+        if not only_alphabet:
             question_no = key[1:]
+        if no_label:
+            question_no = ''
         else:
             question_no = key
 #        p = self.page.get_textpage_ocr(dpi=300, full=True)
-        p = self.page
-        joiners = [". ", ".", ", ", ",", ""]
-        A = None
         if not A:
             if self.lang == "fr":
                 for joiner in joiners:
@@ -129,12 +128,15 @@ class Redactor:
                     if A:
                         break
         if not A:
-            for joiner in joiners:
-                A = p.search(question_no + joiner + self.labeldict[key][self.lang])
-#                if key == "E2_pre":
-#                    print(f"Q: '{question_no}' | J: '{joiner}' | L: '{self.labeldict[key][self.lang]}'")
-                if A:
-                    break
+#            print('looking for area key:', key)
+            if question_no:
+                for joiner in joiners:
+                    A = p.search(question_no + joiner + self.labeldict[key][self.lang])
+                    if A:
+                        break
+            else:
+#                print('searching:', self.labeldict[key][self.lang])
+                A = p.search(self.labeldict[key][self.lang])
         if A:
             return A[0]
         else:
@@ -192,13 +194,13 @@ class Redactor:
             self.page = page.get_textpage_ocr(dpi=300, full=True)
             # Find reference points
             # page 1
-            FOOTER = self.get_area('footer', footer=True)
+            FOOTER = self.get_area('footer', no_label=True)
             A = self.get_area('A', True)
             B = self.get_area('B', True)
             D = self.get_area('D', True)
             E = self.get_area('E', True)
             if FOOTER:
-                FOOTERY = FOOTER[1][1]
+                FOOTERY = FOOTER[1]
             if A and not D:
                 currentpage = 1
             elif D and not A:
@@ -224,7 +226,7 @@ class Redactor:
                         A2_Y0 = A2[3][1] + YFactor_small
                     else: print("A2 not found")
                     if A5:
-                        A_X1 = A5[0][0] - YFactor_small
+                        A_X1 = A5[0][0] - YFactor_small * 2
                     else:
                         A_X1 = XL1
                     if A7:
@@ -233,18 +235,15 @@ class Redactor:
                         A2_Y1 = A6[3][1] + YFactor
                     if B4:
                         B4_Y0 = B4[3][1] + YFactor_small
-                    else: print("B4_Y0 not found")
+                    else: print("A4 not found")
                     if FOOTER:
                         B4_Y1 = FOOTERY - YFactor
                     else:
                         B4_Y1 = B4_Y0 + (A2_Y1 - A2_Y0) * 2
-                        if not B4_Y1:
-                            print("B4_Y1 not found")
                     if B5:
                         B5_Y0 = B5[3][1] + YFactor_small
                     else:
                         B5_Y0 = B[3][1] + YFactor * 2.5
-                    if not B5_Y0: print("B5 not found")
                     B5_Y1 = B4_Y1
                     area_A2 = fitz.Rect(XL0, A2_Y0, A_X1, A2_Y1)
                     area_B4 = fitz.Rect(XL0, B4_Y0, XL1, B4_Y1)
@@ -267,7 +266,7 @@ class Redactor:
                 D4 = self.get_area('D4')
                 D5 = self.get_area('D5')
                 E1 = self.get_area('E1')
-                E2_pre = self.get_area('E2_pre', footer=True)
+                E2_pre = self.get_area('E2_pre', only_alphabet=False, no_label=True)
                 E2 = self.get_area('E2')
                 E3 = self.get_area('E3')
                 try:
@@ -295,9 +294,10 @@ class Redactor:
                         E1_Y1 = E2[1][1] - YFactor * 2
                         E2_Y0 = E2[3][1] + YFactor_small
                     else:
+                        print(E2_pre)
                         if E2_pre:
-                            E1_Y1 = E2_pre[1][1] + YFactor_small
-                            E2_Y0 = E2_pre[3][1] + YFactor * 2.5
+                            E1_Y1 = E2_pre[1][1] - YFactor
+                            E2_Y0 = E2_pre[3][1] + YFactor * 2
                         else:
                             print("E2 not found")
                     if E3:
@@ -354,11 +354,13 @@ class Redactor:
         doc.close()
 
 if __name__ == "__main__":
-    path = 'testing-fr.pdf'
+    path = 'testing.pdf'
     subdir = '.'
     savepath = 'other'
     #path = '000931038 MDPR_2019-7141-QA-ST_687927_F.pdf'
-    path = 'AER 000956061 .pdf'
-    subdir = 'pdfs'
+#    path = '000970646(P30).pdf' # only implemented A2_X1 starting this file (6667th)
+#    subdir = 'pdfs'
+    savepath = '.'
+#    path = 'AER 000956061 .pdf'
     redactor = Redactor(path, subdir, savepath)
     redactor.redaction()
