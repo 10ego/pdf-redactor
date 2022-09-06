@@ -29,8 +29,8 @@ class Redactor:
         self.page2Chk = False
         self.labeldict = {
                 'footer':{
-                    'en':'a program of med',
-                    'fr':'un programme de med'
+                    'en':'a program of medeffect',
+                    'fr':'un programme de medeffect'
                 },
                 'A':{
                     'en':'reporter information',
@@ -120,7 +120,7 @@ class Redactor:
             question_no = key
 #        p = self.page.get_textpage_ocr(dpi=300, full=True)
         p = self.page
-        joiners = [". ", ".", ", ", ",", ""]
+        joiners = ["", ". ", ".", ", ", ","]
         A = None
         if not A:
             if self.lang == "fr":
@@ -131,8 +131,9 @@ class Redactor:
         if not A:
             for joiner in joiners:
                 A = p.search(question_no + joiner + self.labeldict[key][self.lang])
-#                if key == "E2_pre":
-#                    print(f"Q: '{question_no}' | J: '{joiner}' | L: '{self.labeldict[key][self.lang]}'")
+                if key == "footer":
+                    print(f"Q: '{question_no}' | J: '{joiner}' | L: '{self.labeldict[key][self.lang]}' | '{question_no}{joiner}{self.labeldict[key][self.lang]}'")
+                    print("A:", A)
                 if A:
                     break
         if A:
@@ -199,6 +200,7 @@ class Redactor:
             E = self.get_area('E', True)
             if FOOTER:
                 FOOTERY = FOOTER[1][1]
+                print("Footer_Y:",FOOTERY)
             if A and not D:
                 currentpage = 1
             elif D and not A:
@@ -214,7 +216,6 @@ class Redactor:
                 A7 = self.get_area('A7')
                 B4 = self.get_area('B4')
                 B5 = self.get_area('B5')
-
                 try:
                     XL0 = A[0][0] - 5
                     XL1 = bounding[2]/2 - 5
@@ -227,16 +228,20 @@ class Redactor:
                         A_X1 = A5[0][0] - YFactor * 2
                     else:
                         A_X1 = XL1
+                        print("A5 not found")
                     if A7:
                         A2_Y1 = A7[1][1] - YFactor * 2.5
                     else:
                         A2_Y1 = A6[3][1] + YFactor
+                        print("A7 not found")
                     if B4:
                         B4_Y0 = B4[3][1] + YFactor_small
                     else: print("B4_Y0 not found")
                     if FOOTER:
                         B4_Y1 = FOOTERY - YFactor
                     else:
+                        print("Footer not found")
+                        print(f"scaling from B4_Y0:{B4_Y0} by ({A2_Y1} - {A2_Y0}) * 2")
                         B4_Y1 = B4_Y0 + (A2_Y1 - A2_Y0) * 2
                         if not B4_Y1:
                             print("B4_Y1 not found")
@@ -247,12 +252,18 @@ class Redactor:
                     if not B5_Y0: print("B5 not found")
                     B5_Y1 = B4_Y1
                     area_A2 = fitz.Rect(XL0, A2_Y0, A_X1, A2_Y1)
+                    print("area_A2", area_A2)
                     area_B4 = fitz.Rect(XL0, B4_Y0, XL1, B4_Y1)
+                    print("area_B4", area_B4)
                     area_B5 = fitz.Rect(XR0, B5_Y0, XR1, B5_Y1)
+                    print("area_B5", area_B5)
                     areas_page1 = [area_A2, area_B4, area_B5]
                     text_A2 = self.get_pmaptext(area_A2, page)
+                    print("text_A2", text_A2)
                     text_B4 = self.get_pmaptext(area_B4, page)
+                    print("text_B4", text_B4)
                     text_B5 = self.get_pmaptext(area_B5, page)
+                    print("text_B5", text_B5)
                     text_page1 = [text_A2, text_B4, text_B5]
                     hash_page1 = [hashlib.md5(x.encode()).hexdigest() for x in text_page1]
                     assert len(areas_page1) == len(text_page1)
@@ -358,7 +369,8 @@ if __name__ == "__main__":
     subdir = '.'
     savepath = 'other'
     #path = '000931038 MDPR_2019-7141-QA-ST_687927_F.pdf'
-    path = 'AER 000956061 .pdf'
+    #path = 'AER 000956061 .pdf' # A2 right edge and E2 detection improved with this file
+    path = 'AER 000971433 .pdf'
     subdir = 'pdfs'
     redactor = Redactor(path, subdir, savepath)
     redactor.redaction()

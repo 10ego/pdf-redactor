@@ -2555,3 +2555,8 @@
 [2022-09-06 01:59:50]AER 000968273 .pdf, ('exceptions must derive from BaseException',)
 [2022-09-06 02:02:48]AER 000968365 .pdf, ("local variable 'hash_page2' referenced before assignment",)
 [2022-09-06 02:03:18]AER 000968380 .pdf, ("local variable 'hash_page2' referenced before assignment",)
+[2022-09-06 02:19:05]AER 000970937 .pdf, ("local variable 'hash_page2' referenced before assignment",)
+[2022-09-06 02:19:07]AER 000970957  Email.pdf, ('exceptions must derive from BaseException',)
+[2022-09-06 02:20:40]AER 000971023 .pdf, ("local variable 'hash_page2' referenced before assignment",)
+[2022-09-06 02:21:43]AER 000971068 .pdf, ("local variable 'hash_page2' referenced before assignment",)
+[2022-09-06 02:22:16]AER 000971074 .pdf, ("local variable 'hash_page2' referenced before assignment",)
