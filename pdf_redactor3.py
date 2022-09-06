@@ -131,9 +131,9 @@ class Redactor:
         if not A:
             for joiner in joiners:
                 A = p.search(question_no + joiner + self.labeldict[key][self.lang])
-                if key == "footer":
-                    print(f"Q: '{question_no}' | J: '{joiner}' | L: '{self.labeldict[key][self.lang]}' | '{question_no}{joiner}{self.labeldict[key][self.lang]}'")
-                    print("A:", A)
+#                if key == "footer":
+#                    print(f"Q: '{question_no}' | J: '{joiner}' | L: '{self.labeldict[key][self.lang]}' | '{question_no}{joiner}{self.labeldict[key][self.lang]}'")
+#                    print("A:", A)
                 if A:
                     break
         if A:
@@ -252,18 +252,18 @@ class Redactor:
                     if not B5_Y0: print("B5 not found")
                     B5_Y1 = B4_Y1
                     area_A2 = fitz.Rect(XL0, A2_Y0, A_X1, A2_Y1)
-                    print("area_A2", area_A2)
+#                    print("area_A2", area_A2)
                     area_B4 = fitz.Rect(XL0, B4_Y0, XL1, B4_Y1)
-                    print("area_B4", area_B4)
+#                    print("area_B4", area_B4)
                     area_B5 = fitz.Rect(XR0, B5_Y0, XR1, B5_Y1)
-                    print("area_B5", area_B5)
+#                    print("area_B5", area_B5)
                     areas_page1 = [area_A2, area_B4, area_B5]
                     text_A2 = self.get_pmaptext(area_A2, page)
-                    print("text_A2", text_A2)
+#                    print("text_A2", text_A2)
                     text_B4 = self.get_pmaptext(area_B4, page)
-                    print("text_B4", text_B4)
+#                    print("text_B4", text_B4)
                     text_B5 = self.get_pmaptext(area_B5, page)
-                    print("text_B5", text_B5)
+#                    print("text_B5", text_B5)
                     text_page1 = [text_A2, text_B4, text_B5]
                     hash_page1 = [hashlib.md5(x.encode()).hexdigest() for x in text_page1]
                     assert len(areas_page1) == len(text_page1)
