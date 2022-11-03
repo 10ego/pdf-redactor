@@ -147,11 +147,7 @@ class Redactor:
 		tmpdoc = fitz.open("pdf", tmppdf)
 		return tmpdoc[0].get_text()
 
-	def	redaction(self):
-		doc	= fitz.open(self.path)
-		pages_to_delete	= []
-		bounding = doc[0].bound()
-		breaker	= False
+	def	preredaction(self, doc):
 		for	page in	doc:
 			# Quickly check	if the page	is ready to	scan or	requires OCR handling
 			page_ocr = page.get_textpage_ocr(dpi=300, full=True)
@@ -168,7 +164,16 @@ class Redactor:
 						self.REBUILD_PDF = True
 					break
 		if not self.lang:
-			raise "NoLanguageFoundError"
+			errmsg = "NoLanguageFoundError"
+			self.errorlog =	errmsg 
+			raise Exception("NoLanguageFoundError")
+
+	def	redaction(self):
+		doc	= fitz.open(self.path)
+		self.preredaction(doc)
+		pages_to_delete	= []
+		bounding = doc[0].bound()
+		breaker	= False
 		if self.REBUILD_PDF:
 			# Recreate the pdf to rerender cus some	of them	just suck too much (looking	at you "000931038 MDPR_2019-7141-QA-ST_687927_F.pdf")
 			print("rebuilding the pdf")
@@ -286,7 +291,7 @@ class Redactor:
 					assert len(areas_page1)	== len(text_page1)
 					[page.add_redact_annot(x[0], text=x[1],	fontsize=9,	fill=(1,1,1)) for x	in zip(areas_page1,	hash_page1)]
 				except Exception as	e:
-					self.errorlog = e.args
+					self.errorlog =	e.args
 					print(self.errorlog)
 					
 			elif currentpage ==	2:
@@ -381,9 +386,9 @@ class Redactor:
 				continue
 			page.apply_redactions()
 
-		quality_dir	= self.savesubdir
+		quality_dir = self.savesubdir
 
-		# saving it	to a new pdf
+		# saving it to a new pdf
 		if not os.path.exists('data'):
 			os.mkdir('data')
 		if not os.path.exists(f'data/{quality_dir}'):
@@ -405,11 +410,13 @@ class Redactor:
 if __name__	== "__main__":
 	path = 'testing.pdf'
 	subdir = '.'
-	savepath = '.'
+	savepath = 'emails'
 	#path =	'000931038 MDPR_2019-7141-QA-ST_687927_F.pdf'
 	#path =	'AER 000956061 .pdf' # A2 right	edge and E2	detection improved with	this file
 #	 path =	'AER 000971433 .pdf'
 	path = '000833157(UR30).pdf'
 	subdir = 'pdfs'
+	path = '1696379_Preliminary & Final MPR.pdf'
+	subdir = 'emails/pdfs'
 	redactor = Redactor(path, subdir, savepath)
 	redactor.redaction()
