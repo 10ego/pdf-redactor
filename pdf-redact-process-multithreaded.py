@@ -4,38 +4,44 @@ from datetime import datetime
 from multiprocessing import Pool
 
 pdfs = []
-with open('emails/pdfs.txt') as f:
+today = datetime.strftime(datetime.now(), '%Y-%m-%d_%H%M%S')
+datalist = 'pdfs.txt'
+worklog = 'worked_synthdata.log'
+errorlog = 'error_synthdata.log'
+INPUT_DIR = 'emails/pdfs'
+OUTPUT_DIR = 'emails/redacted'
+
+with open(datalist) as f:
 	for line in f:
 		pdfs.append(line.rstrip())
-with open('worked_emails.log') as f:
+with open(worklog) as f:
 	worked = [x[21:].strip() for x in f.readlines()]
-with open('error_emails(pertinence).log') as f:
-	errl = [x[21:].strip().split(',')[0] for x in f.readlines()]
-worked = worked + errl
+
 total = len(pdfs)
 count=0
-#for pdf in pdfs:
+POOL_SIZE = 5
 def pdfproc(pdf, worked = worked, count=0):
-	count+=5
+	count+=POOL_SIZE
+
 	if not pdf in worked:
 		print(f'{count}/{total}:', pdf)
 		try:
-			Redactor = pdf_redactor.Redactor(pdf, 'emails/pdfs', 'emails/redacted')
+			Redactor = pdf_redactor.Redactor(pdf, INPUT_DIR, OUTPUT_DIR)
 			Redactor.redaction()
-			with open('worked_emails.log', 'a+') as f:
+			with open(worklog, 'a+') as f:
 				f.write(f'[{datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S")}]{pdf}\n')
 #		except Exception as e:
 		except Exception as e:
 			print("Error. Skipping.")
-			with open('error_emails.log', 'a+') as f:
+			with open(errorlog, 'a+') as f:
 				f.write(f'[{datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S")}]{pdf}, {e.args}\n')
 			if not Redactor.lang:
-				with open('error_emails(pertinence).log', 'a+') as f:
+				with open('pertinence_synthdata.log', 'a+') as f:
 					f.write(f'[{datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S")}]{pdf}, IMPERTINENT\n')
 	else:
 		pass
 #		print(f'\t{pdf} already worked on')
 
 if __name__=='__main__':
-	with Pool(5) as p:
+	with Pool(POOL_SIZE) as p:
 		p.map(pdfproc, pdfs)

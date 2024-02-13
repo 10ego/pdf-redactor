@@ -1,3 +1,4 @@
+from faker import Faker
 import fitz
 import re
 import json
@@ -28,87 +29,107 @@ class Redactor:
 		self.page1Chk =	False
 		self.page2Chk =	False
 		self.labeldict = {
-				'footer':{
-					'en':'a	program	of medeffect',
-					'fr':'un programme de medeffect'
-				},
-				'A':{
-					'en':'reporter information',
-					'fr':'renseignements sur le'
-				},
-				'A2':{
-					'en':'reporter contact in',
-					'fr':'coordonnées du décla'
-				},
-				'A5':{
-					'en':'type of report',
-					'fr':'type de rapport'
-				},
-				'A6':{
-					'en':'date submit',
-					'fr':'date de '
-				},
-				'A7':{
-					'en':'name and address',
-					'fr':'nom et adresse'
-				},
-				'B':{
-					'en':'incident information',
+			'footer':{
+				'en':'a	program	of medeffect',
+				'fr':'un programme de medeffect'
+			},
+			'A':{
+				'en':'reporter information',
+				'fr':'renseignements sur le'
+			},
+			'A2':{
+				'en':'reporter contact in',
+				'fr':'coordonnées du décla'
+			},
+			'A5':{
+				'en':'type of report',
+				'fr':'type de rapport'
+			},
+			'A6':{
+				'en':'date submit',
+				'fr':'date de '
+			},
+			'A7':{
+				'en':'name and address',
+				'fr':'nom et adresse'
+			},
+			'B':{
+				'en':'incident information',
 #					'fr':"renseignements sur l'incident"	
-					'fr':"renseignements sur l"
-				},
-				'B4':{
-					'en':'patient consequences',
-					'fr':'conséquences pour	le patient'
-				},
-				'B5':{
-					'en':'details of incident',
+				'fr':"renseignements sur l"
+			},
+			'B4':{
+				'en':'patient consequences',
+				'fr':'conséquences pour	le patient'
+			},
+			'B5':{
+				'en':'details of incident',
 #					'fr':"détails sur l'incident"
-					'fr':"détails sur l"
-				},
-				'D':{
-					'en':'complainant information',
-					'fr':'renseignements sur le	plaignant'
-				},
-				'D2':{
-					'en':'Name of complainant',
-					'fr':'Nom du plaignant'
-				},
-				'D3':{
-					'en':'name of health care facility',
+				'fr':"détails sur l"
+			},
+			'D':{
+				'en':'complainant information',
+				'fr':'renseignements sur le	plaignant'
+			},
+			'D2':{
+				'en':'Name of complainant',
+				'fr':'Nom du plaignant'
+			},
+			'D3':{
+				'en':'name of health care facility',
 #					'fr':"nom de l'éstablissement de soins"	# '	(U+0027) are getting caught	as ’ (U+2019) sometimes	and	causing	problems with identification 
-					'fr':"nom de l"
-				},
-				'D4':{
-					'en':'address',
-					'fr':'adresse'
-				},
-				'D5':{
-					'en':'telephone	no',
-					'fr':'numéro de	téléphone'
-				},
-				'E':{
-					'en':'investigation	information',
-					'fr':"renseignements sur"
-				},
-				'E1':{
-					'en':'Investigative	actions',
+				'fr':"nom de l"
+			},
+			'D4':{
+				'en':'address',
+				'fr':'adresse'
+			},
+			'D5':{
+				'en':'telephone	no',
+				'fr':'numéro de	téléphone'
+			},
+			'E':{
+				'en':'investigation	information',
+				'fr':"renseignements sur"
+			},
+			'E1':{
+				'en':'Investigative	actions',
 #					'fr':"mesures d'enquê"
-					'fr':"mesures d"
-				},
-				'E2_pre':{
-					'en':'this section only	applies',
-					'fr':'cette	section	doit être remplie'
-				},
-				'E2':{
-					'en':'root cause of	problem',
-					'fr':'source du	problème'
-				},
-				'E3':{
-					'en':'corrective actions taken as',
-					'fr':'mesures correctives prises'
-				}
+				'fr':"mesures d"
+			},
+			'E2_pre':{
+				'en':'this section only	applies',
+				'fr':'cette	section	doit être remplie'
+			},
+			'E2':{
+				'en':'root cause of	problem',
+				'fr':'source du	problème'
+			},
+			'E3':{
+				'en':'corrective actions taken as',
+				'fr':'mesures correctives prises'
 			}
+		}
+	
+#	delimiter = _|,|;|\n
+#	a2: reporter contact information
+#	 - name
+#	  - phone number
+#	   - email
+#	    - address
+#
+#		  e.g. name, address, phone, email
+#
+#		  d2: name of complainant
+#		  d3: name of health care faciliy
+#		  d4: address
+#		   e.g. name of health care facility + address
+#		   d5: telephone no. and/or email address
+#		   telephone, email
+		self.fake = Faker()
+		self.fakerdict = {
+			'A2': fake.
+		}
 
 	def	get_area(self, key,	only_alphabet=False, footer=False):
 		
@@ -280,7 +301,8 @@ class Redactor:
 					area_B5	= fitz.Rect(XR0, B5_Y0,	XR1, B5_Y1)
 #					 print("area_B5", area_B5)
 					areas_page1	= [area_A2,	area_B4, area_B5]
-					text_A2	= self.get_pmaptext(area_A2, page)
+#					text_A2	= self.get_pmaptext(area_A2, page)
+					text_A2 = 
 #					 print("text_A2", text_A2)
 					text_B4	= self.get_pmaptext(area_B4, page)
 #					 print("text_B4", text_B4)
