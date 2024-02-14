@@ -304,12 +304,15 @@ class Redactor:
 #                    text_B5 = self.get_pmaptext(area_B5, page)
                     text_B5 = self.fake.paragraph(nb_sentences=4)
 # print("text_B5", text_B5)
-                    text_page1 = [text_A2, text_B4,	text_B5]
-                    hash_page1 = [hashlib.md5(x.encode()).hexdigest()
-                                  for x in text_page1]
+                    text_page1 = [text_A2, text_B4, text_B5]
+#                    hash_page1 = [hashlib.md5(x.encode()).hexdigest() for x in text_page1]
                     assert len(areas_page1) == len(text_page1)
-                    [page.add_redact_annot(x[0], text=x[1],	fontsize=9,	fill=(
-                        1, 1, 1)) for x in zip(areas_page1,	hash_page1)]
+                    [page.add_redact_annot(
+                        x[0],
+                        text=x[1],
+                        fontsize=9,
+                        fill=(1, 1, 1)
+                    ) for x in zip(areas_page1, text_page1)]
                 except Exception as e:
                     self.errorlog = e.args
                     print(self.errorlog)
@@ -404,11 +407,10 @@ class Redactor:
                     text_E3 = self.faker.paragraph(nb_sentences=4)
                     text_page2 = [text_D2, text_D3,	text_D4,
                                   text_D5, text_E1, text_E2,	text_E3]
-                    hash_page2 = [hashlib.md5(x.encode()).hexdigest()
-                                  for x in text_page2]
+#                    hash_page2 = [hashlib.md5(x.encode()).hexdigest() for x in text_page2]
                     assert len(areas_page2) == len(text_page2)
-                    [page.add_redact_annot(x[0], text=x[1],	fontsize=9,	fill=(
-                        1, 1, 1)) for x in zip(areas_page2,	hash_page2)]
+                    [page.add_redact_annot(x[0], text=x[1], fontsize=9,	fill=(
+                        1, 1, 1)) for x in zip(areas_page2, text_page2)]
                 except Exception as e:
                     self.errorlog = e.args
                     print(self.errorlog)
@@ -429,15 +431,15 @@ class Redactor:
         if not os.path.exists(f'redacted/{quality_dir}'):
             os.mkdir(f'redacted/{quality_dir}')
 
-        with open(f'data/{quality_dir}/{self.filename[:-4]}.json', 'w+') as f:
-            data = dict({(x[0], x[1].encode().decode()) for x in zip(
-                hash_page1+hash_page2, text_page1+text_page2)})
-            json.dump(data,	f)
+#        with open(f'data/{quality_dir}/{self.filename[:-4]}.json', 'w+') as f:
+#            data = dict({(x[0], x[1].encode().decode()) for x in zip(
+#                hash_page1+hash_page2, text_page1+text_page2)})
+#            json.dump(data, f)
         doc.delete_pages(pages_to_delete)
         doc.scrub()
         doc.save(
             f'redacted/{quality_dir}/{self.filename[:-4]}_REDACTED.pdf', deflate_images=True, deflate_fonts=True)
-        print("Successfully	redacted")
+        print("Successfully redacted")
         doc.close()
 
 
