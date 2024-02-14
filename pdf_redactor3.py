@@ -400,11 +400,11 @@ class Redactor:
 #                    text_D5 = self.get_pmaptext(area_D5, page)
                     text_D5 = self.fakerdict['D5']
 #                    text_E1 = self.get_pmaptext(area_E1, page)
-                    text_E1 = self.faker.paragraph(nb_sentences=4)
+                    text_E1 = self.fake.paragraph(nb_sentences=4)
 #                    text_E2 = self.get_pmaptext(area_E2, page)
-                    text_E2 = self.faker.paragraph(nb_sentences=4)
+                    text_E2 = self.fake.paragraph(nb_sentences=4)
 #                    text_E3 = self.get_pmaptext(area_E3, page)
-                    text_E3 = self.faker.paragraph(nb_sentences=4)
+                    text_E3 = self.fake.paragraph(nb_sentences=4)
                     text_page2 = [text_D2, text_D3,	text_D4,
                                   text_D5, text_E1, text_E2,	text_E3]
 #                    hash_page2 = [hashlib.md5(x.encode()).hexdigest() for x in text_page2]
