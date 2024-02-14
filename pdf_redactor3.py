@@ -443,7 +443,7 @@ class Redactor:
 
 if __name__ == "__main__":
     path = 'raw.pdf'
-    subdir = 'example'
+    subdir = 'examples'
     savepath = 'out'
     # path =	'000931038 MDPR_2019-7141-QA-ST_687927_F.pdf'
     # path =	'AER 000956061 .pdf' # A2 right	edge and E2	detection improved with	this file

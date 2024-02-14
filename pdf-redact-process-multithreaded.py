@@ -7,8 +7,8 @@ today = datetime.strftime(datetime.now(), '%Y-%m-%d_%H%M%S')
 datalist = 'pdfs.txt'
 worklog = 'worked_synthdata.log'
 errorlog = 'error_synthdata.log'
-INPUT_DIR = 'emails/pdfs'
-OUTPUT_DIR = 'emails/redacted'
+INPUT_DIR = 'examples'
+OUTPUT_DIR = 'out'
 
 with open(datalist) as f:
     for line in f:
